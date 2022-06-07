@@ -1,4 +1,3 @@
 module.exports = {
-  name: "flemis",
-  age: 22,
+  message: "Hello World",
 };

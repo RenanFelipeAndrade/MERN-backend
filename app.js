@@ -8,7 +8,7 @@ const data = require("./moduleExample.js");
 const server = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
-  res.end(`Nome: ${data.name}; Idade: ${data.age}`);
+  res.end(`${data.message}`);
 });
 
 server.listen(port, hostname, () => {
