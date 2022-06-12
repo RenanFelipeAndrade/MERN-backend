@@ -1,0 +1,109 @@
+[1mdiff --git a/app.js b/app.js[m
+[1mindex 496fc88..a106592 100644[m
+[1m--- a/app.js[m
+[1m+++ b/app.js[m
+[36m@@ -1,12 +1,16 @@[m
+[32m+[m[32mconst dotenv = require("dotenv");[m
+[32m+[m[32mdotenv.config();[m
+[32m+[m
+ var createError = require("http-errors");[m
+ var express = require("express");[m
+ var path = require("path");[m
+ var cookieParser = require("cookie-parser");[m
+ var logger = require("morgan");[m
+ [m
+[32m+[m[32m// routers[m
+ var indexRouter = require("./routes/index");[m
+ var usersRouter = require("./routes/users");[m
+[31m-var mongoRouter = require("./routes/mongo");[m
+[32m+[m[32mconst articlesRouter = require("./routes/articles");[m
+ [m
+ var app = express();[m
+ [m
+[36m@@ -22,7 +26,7 @@[m [mapp.use(express.static(path.join(__dirname, "public")));[m
+ [m
+ app.use("/", indexRouter);[m
+ app.use("/users", usersRouter);[m
+[31m-app.use("/mongo", mongoRouter);[m
+[32m+[m[32mapp.use("/articles", articlesRouter);[m
+ [m
+ // catch 404 and forward to error handler[m
+ app.use(function (req, res, next) {[m
+[1mdiff --git a/package-lock.json b/package-lock.json[m
+[1mindex 0be05de..ebaac47 100644[m
+[1m--- a/package-lock.json[m
+[1m+++ b/package-lock.json[m
+[36m@@ -10,6 +10,7 @@[m
+       "dependencies": {[m
+         "cookie-parser": "~1.4.4",[m
+         "debug": "~2.6.9",[m
+[32m+[m[32m        "dotenv": "^16.0.1",[m
+         "express": "~4.16.1",[m
+         "http-errors": "~1.6.3",[m
+         "jade": "~1.11.0",[m
+[36m@@ -365,6 +366,14 @@[m
+       "resolved": "https://registry.npmjs.org/destroy/-/destroy-1.0.4.tgz",[m
+       "integrity": "sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg=="[m
+     },[m
+[32m+[m[32m    "node_modules/dotenv": {[m
+[32m+[m[32m      "version": "16.0.1",[m
+[32m+[m[32m      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.1.tgz",[m
+[32m+[m[32m      "integrity": "sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==",[m
+[32m+[m[32m      "engines": {[m
+[32m+[m[32m        "node": ">=12"[m
+[32m+[m[32m      }[m
+[32m+[m[32m    },[m
+     "node_modules/ee-first": {[m
+       "version": "1.1.1",[m
+       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz",[m
+[36m@@ -1422,6 +1431,11 @@[m
+       "resolved": "https://registry.npmjs.org/destroy/-/destroy-1.0.4.tgz",[m
+       "integrity": "sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg=="[m
+     },[m
+[32m+[m[32m    "dotenv": {[m
+[32m+[m[32m      "version": "16.0.1",[m
+[32m+[m[32m      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.1.tgz",[m
+[32m+[m[32m      "integrity": "sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ=="[m
+[32m+[m[32m    },[m
+     "ee-first": {[m
+       "version": "1.1.1",[m
+       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz",[m
+[1mdiff --git a/package.json b/package.json[m
+[1mindex 2ac9c05..22e616b 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -8,6 +8,7 @@[m
+   "dependencies": {[m
+     "cookie-parser": "~1.4.4",[m
+     "debug": "~2.6.9",[m
+[32m+[m[32m    "dotenv": "^16.0.1",[m
+     "express": "~4.16.1",[m
+     "http-errors": "~1.6.3",[m
+     "jade": "~1.11.0",[m
+[1mdiff --git a/routes/mongo.js b/routes/mongo.js[m
+[1mdeleted file mode 100644[m
+[1mindex 4fec680..0000000[m
+[1m--- a/routes/mongo.js[m
+[1m+++ /dev/null[m
+[36m@@ -1,21 +0,0 @@[m
+[31m-const express = require("express");[m
+[31m-const { MongoClient } = require("mongodb");[m
+[31m-const router = express.Router();[m
+[31m-[m
+[31m-const url = "mongodb://127.0.0.1:27017";[m
+[31m-const client = new MongoClient(url);[m
+[31m-const collectionName = "teste";[m
+[31m-[m
+[31m-client.connect();[m
+[31m-const db = client.db("flemis");[m
+[31m-const collection = db.collection(collectionName);[m
+[31m-[m
+[31m-router.get("/", async (request, response, next) => {[m
+[31m-  // this command reads the html file and send it back as a response[m
+[31m-  // response.send(await readFile("./home.html", "utf8"));[m
+[31m-[m
+[31m-  const data = await collection.find().toArray();[m
+[31m-  console.log("the data resgistered", data);[m
+[31m-  response.send(data);[m
+[31m-});[m
+[31m-module.exports = router;[m
