@@ -30,9 +30,31 @@ router.delete("/:articleId", async (request, response, next) => {
   const articleId = request.params.articleId;
   await db
     .collection("articles")
-    .deleteOne({ _id: new ObjectId(articleId) }) //
+    .deleteOne({ _id: new ObjectId(articleId) })
     .then(() => response.send(`The article was deleted`))
-    .catch((error) => console.log(error.message, "error"));
+    .catch((error) => response.send(`An error has occoured: ${error}`));
+});
+
+router.patch("/:articleId", async (request, response, next) => {
+  // update a article with a specified id
+  const article = {
+    _id: request.body._id,
+    title: request.body.title,
+    text: request.body.text,
+  };
+
+  if (request.params.articleId !== article._id)
+    return response.send(`An error has occoured`);
+
+  await db
+    .collection("articles")
+    .updateOne(
+      { _id: new ObjectId(article._id) },
+      // update operator $set adds new fields to the document, or update if already exists
+      { $set: { text: article.text, title: article.title } }
+    )
+    .then(() => response.send(`The article ${article.title} was updated`))
+    .catch((error) => response.send(`An error has occoured: ${error}`));
 });
 
 module.exports = router;
