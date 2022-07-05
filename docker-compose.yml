@@ -1,0 +1,36 @@
+version: "1.0"
+services:
+  backend:
+    container_name: sna-backend
+    restart: always
+    build: . # put the corresponding path to backend container
+    ports:
+      - "8000:3000" # port mapping devManchine:dockerContainer
+    volumes:
+      # this path is relative file system of the container
+      - .:/usr/src/backend # without this, nothing will be saved
+      - /usr/src/backend/node_modules # avoids downloading all dependencies again
+    depends_on:
+      - mongo # container that depends on
+  frontend:
+    container_name: sna-frontend
+    restart: always
+    build: ../frontend
+    ports:
+      - "3000:3000" # port mapping devManchine:dockerContainer
+    depends_on:
+      - backend # container that depends on
+    volumes:
+      - ../frontend/:/usr/src/frontend # without this, nothing will be saved
+  mongo:
+    container_name: sna-mongo
+    image: mongo
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017" # port mapping devManchine:dockerContainer
+    volumes:
+      - sna-mongo:/data/db # without this, nothing will be saved
+
+volumes:
+  sna-mongo:
