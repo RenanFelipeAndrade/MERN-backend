@@ -9,5 +9,5 @@ async function connectDatabase() {
 connectDatabase();
 
 module.exports = {
-  db: client.db("simpleNoteApp"),
+  db: client.db("simpleNodeApp"),
 };
