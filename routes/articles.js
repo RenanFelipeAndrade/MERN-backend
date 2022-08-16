@@ -10,11 +10,31 @@ router.get("/", async (request, response, next) => {
 });
 
 router.post("/", (request, response, next) => {
+  const authorCollection = db.collection("authors");
+
+  // the author object
+  const author = request.body.author;
+
   // create a new article
   const newArticle = {
     title: request.body.title,
     text: request.body.text,
+    author: author.name,
+    createdAt: new Date(),
   };
+
+  // creates a new author
+  authorCollection
+    .findOne({ googleId: author.googleId })
+    .then((authorQuery) => {
+      if (authorQuery === null)
+        authorCollection
+          .insertOne(author)
+          .then(() => console.log("New author created"))
+          .catch((error) => console.log(error));
+    });
+
+  // creates a new article
   db.collection("articles")
     .insertOne(newArticle)
     .then(() =>
