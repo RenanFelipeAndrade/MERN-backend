@@ -13,15 +13,7 @@ router.post("/", (request, response, next) => {
   const authorCollection = db.collection("authors");
 
   // the author object
-  const author = request.body.author;
-
-  // create a new article
-  const newArticle = {
-    title: request.body.title,
-    text: request.body.text,
-    author: author.name,
-    createdAt: new Date(),
-  };
+  let author = request.body.author;
 
   // creates a new author
   authorCollection
@@ -30,9 +22,17 @@ router.post("/", (request, response, next) => {
       if (authorQuery === null)
         authorCollection
           .insertOne(author)
-          .then(() => console.log("New author created"))
+          .then((newAuthor) => (author = newAuthor))
           .catch((error) => console.log(error));
     });
+
+  // create a new article
+  const newArticle = {
+    title: request.body.title,
+    text: request.body.text,
+    author: author,
+    createdAt: new Date(),
+  };
 
   // creates a new article
   db.collection("articles")
