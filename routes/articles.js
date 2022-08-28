@@ -2,35 +2,20 @@ const express = require("express");
 const { ObjectId } = require("mongodb");
 const router = express.Router();
 const { db } = require("../database/mongoDb");
+const auth = require("../utils/auth");
 
-router.get("/", async (request, response, next) => {
+router.get("/", auth, async (request, response) => {
   // get all articles
   const articles = await db.collection("articles").find().toArray();
   response.send(JSON.stringify(articles));
 });
 
-router.post("/", (request, response, next) => {
-  const authorCollection = db.collection("authors");
-
-  // the author object
-  let author = request.body.author;
-
-  // creates a new author
-  authorCollection
-    .findOne({ googleId: author.googleId })
-    .then((authorQuery) => {
-      if (authorQuery === null)
-        authorCollection
-          .insertOne(author)
-          .then((newAuthor) => (author = newAuthor))
-          .catch((error) => console.log(error));
-    });
-
+router.post("/", auth, (request, response, _) => {
   // create a new article
   const newArticle = {
     title: request.body.title,
     text: request.body.text,
-    author: author,
+    author: request.body.author,
     createdAt: new Date(),
   };
 
@@ -45,7 +30,7 @@ router.post("/", (request, response, next) => {
     .catch((error) => response.send(`An error has occoured: ${error}`));
 });
 
-router.delete("/:articleId", async (request, response, next) => {
+router.delete("/:articleId", auth, async (request, response) => {
   // delete a article with a specified id
   const articleId = request.params.articleId;
   await db
@@ -55,12 +40,13 @@ router.delete("/:articleId", async (request, response, next) => {
     .catch((error) => response.send(`An error has occoured: ${error}`));
 });
 
-router.patch("/:articleId", async (request, response, next) => {
+router.patch("/:articleId", auth, async (request, response, next) => {
   // update a article with a specified id
   const article = {
     _id: request.body._id,
     title: request.body.title,
     text: request.body.text,
+    author: request.body.author,
   };
 
   if (request.params.articleId !== article._id)
