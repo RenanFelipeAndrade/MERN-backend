@@ -1,9 +1,11 @@
 module.exports = (request, response, next) => {
   try {
     const token = request.headers.authorization.split(" ")[1];
-    if (!token) throw "No access token provided";
+    const tokenParts = token.split(".");
+
+    if (!token || tokenParts.length === 0) throw "No access token provided";
     next();
-  } catch {
+  } catch (error) {
     response.status(401).json({
       error: new Error("Invalid request!"),
     });
