@@ -5,7 +5,7 @@ module.exports = (request, response, next) => {
 
     if (!token || tokenParts.length === 0) throw "No access token provided";
     next();
-  } catch (error) {
+  } catch {
     response.status(401).json({
       error: new Error("Invalid request!"),
     });
